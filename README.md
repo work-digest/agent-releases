@@ -37,6 +37,27 @@ chmod +x WorkDigest-Agent-linux  # o WorkDigest-Agent-macos
 ./WorkDigest-Agent-linux --token TU_TOKEN_AQUÍ --server wss://workdigest.io/agent-ws
 ```
 
+### Redes con inspección TLS (cortafuegos corporativo)
+
+Si tu organización inspecciona el tráfico HTTPS —FortiGate, Zscaler, Palo Alto y similares—,
+el cortafuegos presenta certificados firmados por la autoridad de certificación (CA) de la
+empresa. El navegador funciona porque esa CA está instalada en el equipo, pero **el agente no
+usa el almacén de certificados del sistema**: lleva su propia lista, así que fallará con
+errores de certificado aunque todo lo demás navegue con normalidad.
+
+Se resuelve indicándole la CA de tu organización. Pídesela a tu departamento de sistemas —es
+la misma que ya tienen desplegada en todos los equipos— y arranca el agente así:
+
+```cmd
+WorkDigest-Agent-windows.exe --token TU_TOKEN --ca C:uta\ca-corporativa.pem
+```
+
+También se puede indicar con la variable `WD_CA_CERT`, o con `"caCert"` en el fichero de
+configuración `~/.workdigest-agent.json` si prefieres no repetirla en cada arranque.
+
+Si la ruta no es correcta, el agente **arranca igualmente** y lo dice en el registro: así se
+distingue un problema de certificados de cualquier otro fallo de conexión.
+
 ### 4. Verifica la conexión
 
 1. Vuelve a **Mi Puente** en WorkDigest
