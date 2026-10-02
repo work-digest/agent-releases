@@ -49,7 +49,7 @@ Se resuelve indicándole la CA de tu organización. Pídesela a tu departamento 
 la misma que ya tienen desplegada en todos los equipos— y arranca el agente así:
 
 ```cmd
-WorkDigest-Agent-windows.exe --token TU_TOKEN --ca C:uta\ca-corporativa.pem
+WorkDigest-Agent-windows.exe --token TU_TOKEN --ca "C:\ruta\ca-corporativa.pem"
 ```
 
 También se puede indicar con la variable `WD_CA_CERT`, o con `"caCert"` en el fichero de
