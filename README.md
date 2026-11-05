@@ -24,36 +24,50 @@ Usa los enlaces de la tabla anterior o descárgalo directamente desde [la últim
 4. Haz clic en **Generar token**
 5. **Copia el token** — solo se muestra una vez
 
-### 3. Ejecuta el agente
+### 3. Ejecuta el agente y pega el token
 
-**Windows:**
-```cmd
-WorkDigest-Agent-windows.exe --token TU_TOKEN_AQUÍ --server wss://workdigest.io/agent-ws
-```
+**Windows:** haz doble clic en `WorkDigest-Agent-windows.exe`.
 
 **Linux/macOS:**
 ```bash
 chmod +x WorkDigest-Agent-linux  # o WorkDigest-Agent-macos
-./WorkDigest-Agent-linux --token TU_TOKEN_AQUÍ --server wss://workdigest.io/agent-ws
+./WorkDigest-Agent-linux
 ```
+
+La primera vez te pide el token: pégalo y pulsa Intro. Se guarda en `~/.workdigest-agent.json`,
+con permisos solo para tu usuario, y **no hay que volver a escribirlo**, ni siquiera cuando el
+agente se actualiza solo.
+
+**En un servidor sin pantalla o como servicio**, guarda el token en un fichero que solo pueda
+leer el usuario que ejecuta el agente y arráncalo así (desde la versión 0.2.16):
+
+```bash
+nano /etc/workdigest/token          # pega el token, guarda y sal
+chmod 600 /etc/workdigest/token
+./WorkDigest-Agent-linux --token-file /etc/workdigest/token
+```
+
+> **No escribas el token con `--token`**: lo que va en la línea de órdenes lo ve cualquier
+> usuario del equipo en la lista de procesos y se queda en el historial de la terminal. Se sigue
+> aceptando por compatibilidad, pero el agente avisa, lo guarda en la configuración y lo quita de
+> sus argumentos.
 
 ### Redes con inspección TLS (cortafuegos corporativo)
 
 Si tu organización inspecciona el tráfico HTTPS —FortiGate, Zscaler, Palo Alto y similares—,
 el cortafuegos presenta certificados firmados por la autoridad de certificación (CA) de la
-empresa. El navegador funciona porque esa CA está instalada en el equipo, pero **el agente no
-usa el almacén de certificados del sistema**: lleva su propia lista, así que fallará con
-errores de certificado aunque todo lo demás navegue con normalidad.
+empresa. El agente ya confía en los certificados instalados en el sistema operativo, así que si
+esa CA está desplegada en el equipo normalmente no hay que hacer nada.
 
-Se resuelve indicándole la CA de tu organización. Pídesela a tu departamento de sistemas —es
-la misma que ya tienen desplegada en todos los equipos— y arranca el agente así:
+Si aun así falla con errores de certificado, indícale la CA de tu organización (pídesela a tu
+departamento de sistemas):
 
 ```cmd
-WorkDigest-Agent-windows.exe --token TU_TOKEN --ca "C:\ruta\ca-corporativa.pem"
+WorkDigest-Agent-windows.exe --ca "C:\ruta\ca-corporativa.pem"
 ```
 
 También se puede indicar con la variable `WD_CA_CERT`, o con `"caCert"` en el fichero de
-configuración `~/.workdigest-agent.json` si prefieres no repetirla en cada arranque.
+configuración `~/.workdigest-agent.json` para no repetirla en cada arranque.
 
 Si la ruta no es correcta, el agente **arranca igualmente** y lo dice en el registro: así se
 distingue un problema de certificados de cualquier otro fallo de conexión.
@@ -84,7 +98,7 @@ Una vez el agente está conectado, puedes configurar conectores en WorkDigest qu
 
 **El estado sigue como Desconectado tras ejecutar el agente**
 
-- Verifica que el token es correcto (cópialo de nuevo desde **Mi Puente**)
+- Verifica que el token es correcto. Para cambiarlo, borra `~/.workdigest-agent.json` y vuelve a abrir el agente: te lo pedirá de nuevo
 - Comprueba que tienes conexión a internet
 - Asegúrate de que el firewall no bloquea conexiones salientes a `workdigest.io` por el puerto 443
 
