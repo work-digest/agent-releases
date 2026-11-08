@@ -52,6 +52,30 @@ chmod 600 /etc/workdigest/token
 > aceptando por compatibilidad, pero el agente avisa, lo guarda en la configuración y lo quita de
 > sus argumentos.
 
+### Tú decides qué ve WorkDigest (desde la versión 0.2.17)
+
+Al configurarlo por primera vez, el agente te pregunta **qué carpetas puede leer** y **con qué
+servidores puede conectar** (tu Redmine, tu Jira…). Lo que no esté en esa lista se rechaza, aunque
+alguien lo configure en WorkDigest: la lista se guarda en `~/.workdigest-agent.json` y **solo se
+cambia en este equipo**.
+
+```bash
+WorkDigest-Agent-windows.exe --permisos                                  # ver la lista
+WorkDigest-Agent-windows.exe --permitir-carpeta "D:\Proyectos"           # incluye sus subcarpetas
+WorkDigest-Agent-windows.exe --permitir-host redmine.miempresa.local
+WorkDigest-Agent-windows.exe --permitir-host "*.sharepoint.com"          # todos sus subdominios
+WorkDigest-Agent-windows.exe --quitar-carpeta "D:\Proyectos"
+WorkDigest-Agent-windows.exe --quitar-host redmine.miempresa.local
+```
+
+(En Linux y macOS, igual con `./WorkDigest-Agent-linux` o `./WorkDigest-Agent-macos`.) Los cambios
+valen al momento, sin reiniciar el agente. Para SharePoint en la nube permite `graph.microsoft.com`
+y `*.sharepoint.com`; para GitHub, `api.github.com`.
+
+Si instalaste el agente antes de la 0.2.17 no tiene lista: sigue leyendo lo que se le pida y lo
+avisa al arrancar y en **Mi Puente**. En cuanto permitas la primera carpeta o servidor, empieza a
+rechazar todo lo demás.
+
 ### Redes con inspección TLS (cortafuegos corporativo)
 
 Si tu organización inspecciona el tráfico HTTPS —FortiGate, Zscaler, Palo Alto y similares—,
@@ -106,10 +130,16 @@ Una vez el agente está conectado, puedes configurar conectores en WorkDigest qu
 
 - El token solo se muestra una vez al generarlo. Si no lo copiaste, genera uno nuevo desde **Mi Puente** y revoca el anterior.
 
+**«Mi puente no tiene permitido leer la carpeta…» o «…conectar con…»**
+
+- Esa carpeta o ese servidor no están en la lista de este equipo. Si quieres que WorkDigest los
+  use, ejecuta en el equipo la orden que aparece en el mensaje (`--permitir-carpeta` o
+  `--permitir-host`).
+
 **El conector no encuentra archivos**
 
 - Verifica que la ruta configurada en el conector existe en el equipo donde corre el agente
-- En Windows, usa rutas completas: `C:\Users\jorge\Documentos\Proyectos`
+- En Windows, usa rutas completas: `D:\Proyectos\Cliente A`
 - El agente necesita permisos de lectura sobre esa carpeta
 
 ## Versiones
